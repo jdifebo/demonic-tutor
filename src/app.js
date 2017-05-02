@@ -15,7 +15,8 @@ let state = {
 			excludeUnselected: false,
 			requireAll: false,
 			colorIdentity: false
-		}
+		},
+		format: "Vintage",
 	}
 }
 
@@ -112,7 +113,6 @@ function renderSingleCard(card) {
 	`
 }
 
-
 function renderCards(state) {
 	let startCard = state.pageNumberZeroIndexed * cardsPerPage;
 	let endCard = Math.min(startCard + cardsPerPage, state.searchResults.length);
@@ -168,19 +168,22 @@ function filterAndRenderCards() {
 	// for each space-separated token that the user supplies for type, I want to make sure that that type is matched by the card's type
 
 	let colorMatcher = createColorMatcherFunction();
+	function formatMatcher(formats){
+		return (formats !== undefined && formats[state.inputs.format] !== undefined && 
+			(formats[state.inputs.format] === "Legal" || formats[state.inputs.format] === "Restricted"))
+	} 
 
 	state.searchResults = state.allCards
 		.filter(card =>
 			nameFilter.test(card.name) &&
 			textFilter.test(card.text) &&
 			typesFilters.map(typeFilter => typeFilter.test(card.type)).reduce((b1, b2) => b1 && b2, true) &&
-			colorMatcher(card)
+			colorMatcher(card) &&
+			formatMatcher(card.formats)
 		);
 	state.pageNumberZeroIndexed = 0;
 	renderCards(state);
 }
-
-
 
 (function addAllEventListeners() {
 	document.getElementById("previous").addEventListener("click", function () {
@@ -201,6 +204,30 @@ function filterAndRenderCards() {
 	document.getElementById("last").addEventListener("click", function () {
 		state.pageNumberZeroIndexed = Math.floor(state.searchResults.length / cardsPerPage);
 		renderCards(state);
+	});
+		
+	document.getElementById("previous-bottom").addEventListener("click", function () {
+		state.pageNumberZeroIndexed = Math.max(state.pageNumberZeroIndexed - 1, 0);
+		renderCards(state);
+		window.scrollTo(0, 0);
+	});
+
+	document.getElementById("next-bottom").addEventListener("click", function () {
+		state.pageNumberZeroIndexed = Math.min(state.pageNumberZeroIndexed + 1, Math.floor(state.searchResults.length / cardsPerPage));
+		renderCards(state);
+		window.scrollTo(0, 0);
+	});
+
+	document.getElementById("first-bottom").addEventListener("click", function () {
+		state.pageNumberZeroIndexed = 0;
+		renderCards(state);
+		window.scrollTo(0, 0);
+	});
+
+	document.getElementById("last-bottom").addEventListener("click", function () {
+		state.pageNumberZeroIndexed = Math.floor(state.searchResults.length / cardsPerPage);
+		renderCards(state);
+		window.scrollTo(0, 0);
 	});
 
 
@@ -235,6 +262,11 @@ function filterAndRenderCards() {
 		state.inputs.colors.excludeUnselected = event.target.checked;
 		filterAndRenderCards();
 	});
+
+	document.getElementById("format-input").addEventListener("change", function (event) {
+		state.inputs.format = event.target.value;
+		filterAndRenderCards();
+	});
 })();
 
 (function setInitialState(){
@@ -246,6 +278,7 @@ function filterAndRenderCards() {
 	});
 	state.inputs.colors.requireAll = document.getElementById("require-all").checked;
 	state.inputs.colors.excludeUnselected = document.getElementById("exclude-unselected").checked;
+	state.inputs.format = document.getElementById("format-input").value;
 })();
 
 callAjax("resources/cards.json", responseText => {

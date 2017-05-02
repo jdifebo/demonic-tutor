@@ -5,10 +5,33 @@
  * also replaces color names with single letters.
  */
 
+let original = require("../resources/AllCards-x.json");
 
-let original = require("../resources/AllCards.json");
+function simplifyFormats(originalCard){
+    if (originalCard.legalities === undefined){
+        if (originalCard.printings.includes("C16")){
+            return {
+                "Commander": "Legal",
+                "Legacy": "Legal",
+                "Vintage": "Legal"
+            }
+        }
+        return undefined;
+    }
+    let formats = {}
+    originalCard.legalities.forEach(legality => formats[legality.format] = legality.legality);
+    return formats;
+}
 
-function modifyCard(card){
+function modifyCard(originalCard){
+    let card = {};
+    card.name = originalCard.name;
+    card.cmc = originalCard.cmc;
+    card.type = originalCard.type;
+    card.text = originalCard.text;
+    card.formats = simplifyFormats(originalCard);
+    card.manaCost = originalCard.manaCost;
+
     let colorNameToSymbol = {
         "White" : "W",
         "Blue" : "U",
@@ -18,8 +41,8 @@ function modifyCard(card){
 
     }
 
-    if (card.colors !== undefined){
-        card.colors = card.colors.map(old => colorNameToSymbol[old])
+    if (originalCard.colors !== undefined){
+        card.colors = originalCard.colors.map(old => colorNameToSymbol[old])
     }
 
     if (card.names && card.names.length > 1) {
@@ -32,7 +55,7 @@ function modifyCard(card){
         // Something for other jank too!
     }
     else {
-        delete card.imageName;
+        // delete card.imageName;
     }
     return card;
 }
