@@ -22,7 +22,7 @@ let state = {
 const cardsPerPage = 20;
 
 function symbolToUrl(symbol) {
-	return "resources/symbols/" + symbol.replace("/", "") + ".svg"
+	return "resources/symbols/" + symbol.toLowerCase().replace("/", "") + ".svg"
 }
 
 function renderManaSymbol(symbol, size) {
@@ -64,7 +64,7 @@ function renderText(text) {
 function renderSingleCard(card) {
 	let imgSrc = "http://gatherer.wizards.com/Handlers/Image.ashx?name=" + card.name + "&type=card&.jpg";
 	let name = card.name;
-	let manaCostSymbols = card.manaCost ? card.manaCost.toLowerCase().substring(1, card.manaCost.length - 1).split("}{") : [];
+	let manaCostSymbols = card.manaCost ? card.manaCost.substring(1, card.manaCost.length - 1).split("}{") : [];
 	let manaCostImages = manaCostSymbols.map(symbol => renderManaSymbol(symbol)).join("");
 	let cmc = card.cmc || 0;
 	let type = card.type;
