@@ -31,6 +31,9 @@ function modifyCard(originalCard){
     card.text = originalCard.text;
     card.formats = simplifyFormats(originalCard);
     card.manaCost = originalCard.manaCost;
+    card.power = originalCard.power;
+    card.toughness = originalCard.toughness;
+    card.loyalty = originalCard.loyalty;
 
     let colorNameToSymbol = {
         "White" : "W",
