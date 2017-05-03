@@ -63,7 +63,7 @@ function renderText(text) {
 }
 
 function renderSingleCard(card) {
-	let imgSrc = "http://gatherer.wizards.com/Handlers/Image.ashx?name=" + card.name + "&type=card&.jpg";
+	let imgSrc = "http://gatherer.wizards.com/Handlers/Image.ashx?name=" + (card.image ? card.image : card.name) + "&type=card&.jpg";
 	let name = card.name;
 	let manaCostSymbols = card.manaCost ? card.manaCost.substring(1, card.manaCost.length - 1).split("}{") : [];
 	let manaCostImages = manaCostSymbols.map(symbol => renderManaSymbol(symbol)).join("");
@@ -81,7 +81,7 @@ function renderSingleCard(card) {
 	return `
 	            <div class="row">
                     <div class="col-4">
-                        <img src="` + imgSrc + `"/>
+                        <img src="` + imgSrc + `" style="max-width:100%"/>
                     </div>
                     <div class="col-8">
                         <div class="card">
@@ -170,7 +170,7 @@ function filterAndRenderCards() {
 	let colorMatcher = createColorMatcherFunction();
 	function formatMatcher(formats){
 		return (formats !== undefined && formats[state.inputs.format] !== undefined && 
-			(formats[state.inputs.format] === "Legal" || formats[state.inputs.format] === "Restricted"))
+			(formats[state.inputs.format] === "Legal" || formats[state.inputs.format] === "Restricted")) || state.inputs.format === "All"
 	} 
 
 	state.searchResults = state.allCards

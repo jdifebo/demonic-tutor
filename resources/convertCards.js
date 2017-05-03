@@ -5,7 +5,7 @@
  * also replaces color names with single letters.
  */
 
-let original = require("../resources/AllCards-x.json");
+let original = require("./AllCards-x.json");
 
 function simplifyFormats(originalCard){
     if (originalCard.legalities === undefined){
@@ -45,14 +45,10 @@ function modifyCard(originalCard){
         card.colors = originalCard.colors.map(old => colorNameToSymbol[old])
     }
 
-    if (card.names && card.names.length > 1) {
-        // We'll do something special for cards with multiple names
-
-        // One case for split cards (to get the right image at least)
-
-        // Something for flip cards
-
-        // Something for other jank too!
+    if (originalCard.names && originalCard.names.length > 1) {
+        if (originalCard.layout === "split") {
+            card.image = originalCard.names.join(" // ");
+        }
     }
     else {
         // delete card.imageName;
