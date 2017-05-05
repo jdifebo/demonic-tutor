@@ -17,6 +17,7 @@ let state = {
 			colorIdentity: false
 		},
 		format: "Vintage",
+		sort: [],
 	}
 }
 
@@ -122,7 +123,18 @@ function renderCards(state) {
 	let renderedCards = cardsToDisplay.map(renderSingleCard).join("")
 
 	document.getElementById("results").innerHTML = renderedCards;
-	document.getElementById("results-count").innerHTML = "Showing " + (startCard + 1) + " - " + endCard + " of " + state.searchResults.length + " results"
+	document.getElementById("results-count").innerHTML = 
+		"Showing " + 
+		(state.searchResults.length > 0 ? (startCard + 1) + " - " + endCard + " of " : "")
+		 + state.searchResults.length + " results";
+	if (state.searchResults.length <= cardsPerPage){
+		document.getElementById("pagination-top").style.display = "none";
+		document.getElementById("pagination-bottom").style.display = "none";
+	}
+	else {
+		document.getElementById("pagination-top").style.display = "";
+		document.getElementById("pagination-bottom").style.display = "";
+	}
 }
 
 function callAjax(url, callback) {
@@ -149,7 +161,7 @@ function createColorMatcherFunction() {
 	else if (state.inputs.colors.excludeUnselected) {
 		colorMatcher = card => ["W", "U", "B", "R", "G"].filter(color => state.inputs.colors[color] === false).some(selectedColor => (card.colors && card.colors.includes(selectedColor))) == false
 	}
-	else if (["W", "U", "B", "R", "G"].some(color => state.inputs.colors[color]) == false){
+	else if (["W", "U", "B", "R", "G"].some(color => state.inputs.colors[color]) == false) {
 		colorMatcher = card => true;
 	}
 	else if (state.inputs.colors.requireAll) {
@@ -161,6 +173,58 @@ function createColorMatcherFunction() {
 	return colorMatcher;
 }
 
+function sortFunction(c1, c2, sortCriteria) {
+	let field1;
+	let field2;
+	for (let i = 0; i < sortCriteria.length; i++) {
+		if (sortCriteria[i].by === "name"){
+			field1 = c1.name;	// All cards have names, that's one of the few things that's guaranteed
+			field2 = c2.name;
+		}
+		else if (sortCriteria[i].by === "color"){
+			field1 = c1.colors === undefined ? "" : c1.colors.join("");
+			field2 = c2.colors === undefined ? "" : c2.colors.join("");
+		}
+		else if (sortCriteria[i].by === "cmc"){
+			field1 = c1.cmc || 0;
+			field2 = c2.cmc || 0;
+		}
+		else if (sortCriteria[i].by === "power"){
+			field1 = c1.power === "*" ? 0 : parseInt(c1.power);
+			field2 = c2.power === "*" ? 0 : parseInt(c2.power);
+		}
+		else if (sortCriteria[i].by === "toughness"){
+			field1 = c1.toughness === "*" ? 0 : parseInt(c1.toughness);
+			field2 = c2.toughness === "*" ? 0 : parseInt(c2.toughness);
+		}
+		else if (sortCriteria[i].by === "loyalty"){
+			field1 = c1.loyalty === "X" ? 0 : parseInt(c1.loyalty);
+			field2 = c2.loyalty === "X" ? 0 : parseInt(c2.loyalty);
+		}
+		
+		/**
+		 * if doing a numerical sort, return all NaN values last regardless of
+		 * sort order.  That's what the first 3 checks are for
+		 */
+		if (Number.isNaN(field1) && Number.isNaN(field2)){
+			break;
+		}
+		else if (!Number.isNaN(field1) && Number.isNaN(field2)){
+			return -1;
+		}
+		else if (Number.isNaN(field1) && !Number.isNaN(field2)){
+			return 1;
+		}
+		else if (field1 > field2) {
+			return sortCriteria[i].order;
+		}
+		else if (field1 < field2) {
+			return sortCriteria[i].order * -1;
+		}
+	}
+	return 0;
+}
+
 function filterAndRenderCards() {
 	let nameFilter = new RegExp(state.inputs.name, "i");
 	let textFilter = new RegExp(state.inputs.text, "i");
@@ -168,10 +232,10 @@ function filterAndRenderCards() {
 	// for each space-separated token that the user supplies for type, I want to make sure that that type is matched by the card's type
 
 	let colorMatcher = createColorMatcherFunction();
-	function formatMatcher(formats){
-		return (formats !== undefined && formats[state.inputs.format] !== undefined && 
+	function formatMatcher(formats) {
+		return (formats !== undefined && formats[state.inputs.format] !== undefined &&
 			(formats[state.inputs.format] === "Legal" || formats[state.inputs.format] === "Restricted")) || state.inputs.format === "All"
-	} 
+	}
 
 	state.searchResults = state.allCards
 		.filter(card =>
@@ -183,6 +247,11 @@ function filterAndRenderCards() {
 		);
 	state.pageNumberZeroIndexed = 0;
 	renderCards(state);
+}
+
+function sortAndRefilter() {
+	state.allCards.sort((c1, c2) => sortFunction(c1, c2, state.inputs.sort));
+	filterAndRenderCards();
 }
 
 (function addAllEventListeners() {
@@ -205,7 +274,7 @@ function filterAndRenderCards() {
 		state.pageNumberZeroIndexed = Math.floor(state.searchResults.length / cardsPerPage);
 		renderCards(state);
 	});
-		
+
 	document.getElementById("previous-bottom").addEventListener("click", function () {
 		state.pageNumberZeroIndexed = Math.max(state.pageNumberZeroIndexed - 1, 0);
 		renderCards(state);
@@ -267,9 +336,27 @@ function filterAndRenderCards() {
 		state.inputs.format = event.target.value;
 		filterAndRenderCards();
 	});
+
+	document.getElementById("sort-primary").addEventListener("change", function (event) {
+		state.inputs.sort[0] = sortDropdownConverter(event.target.value);
+		sortAndRefilter();
+	});
+
+	document.getElementById("sort-secondary").addEventListener("change", function (event) {
+		state.inputs.sort[1] = sortDropdownConverter(event.target.value);
+		sortAndRefilter();
+	});
 })();
 
-(function setInitialState(){
+function sortDropdownConverter(value){
+	let parts = value.split(" ");
+	return {
+			by : parts[0].toLowerCase(), 
+			order : parts[1] === "(Ascending)" ? 1 : -1
+		};
+}
+
+(function setInitialState() {
 	state.inputs.name = document.getElementById("name-input").value;
 	state.inputs.text = document.getElementById("text-input").value;
 	state.inputs.types = document.getElementById("types-input").value;
@@ -279,10 +366,12 @@ function filterAndRenderCards() {
 	state.inputs.colors.requireAll = document.getElementById("require-all").checked;
 	state.inputs.colors.excludeUnselected = document.getElementById("exclude-unselected").checked;
 	state.inputs.format = document.getElementById("format-input").value;
+	state.inputs.sort[0] = sortDropdownConverter(document.getElementById("sort-primary").value);
+	state.inputs.sort[1] = sortDropdownConverter(document.getElementById("sort-secondary").value);
 })();
 
 callAjax("resources/cards.json", responseText => {
 	state.allCards = JSON.parse(responseText);
-	filterAndRenderCards();
+	sortAndRefilter();
 });
 

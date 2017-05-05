@@ -46,6 +46,19 @@
 							</div>
 						</div>
 						<div class="form-group row">
+							<label for="format-input" class="col-2 col-form-label">Format</label>
+							<div class="col-10">
+								<select class="form-control" id="format-input">
+									<option>Vintage</option>
+									<option>Legacy</option>
+									<option>Modern</option>
+									<option>Standard</option>
+									<option>Commander</option>
+									<option value="All">All Cards (including special cards)</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row">
 							<div class="col">
 								<label class="form-check-label">
 									<input id="W" type="checkbox" class="form-check-input">
@@ -101,16 +114,42 @@
 								</label>
 							</div>
 						</div>
+
 						<div class="form-group row">
-							<label for="format-input" class="col-2 col-form-label">Format</label>
-							<div class="col-10">
-								<select class="form-control" id="format-input">
-									<option>Vintage</option>
-									<option>Legacy</option>
-									<option>Modern</option>
-									<option>Standard</option>
-									<option>Commander</option>
-									<option value="All">All Cards (including special cards)</option>
+							<label for="sort-primary" class="col-4 col-form-label">Primary Sort</label>
+							<div class="col-8">
+								<select class="form-control" id="sort-primary">
+									<option>Name (Ascending)</option>
+									<option>Name (Descending)</option>
+									<option>CMC (Ascending)</option>
+									<option>CMC (Descending)</option>
+									<option>Color (Ascending)</option>
+									<option>Color (Descending)</option>
+									<option>Power (Ascending)</option>
+									<option>Power (Descending)</option>
+									<option>Toughness (Ascending)</option>
+									<option>Toughness (Descending)</option>
+									<option>Loyalty (Ascending)</option>
+									<option>Loyalty (Descending)</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row">
+							<label for="sort-secondary" class="col-4 col-form-label">Secondary Sort</label>
+							<div class="col-8">
+								<select class="form-control" id="sort-secondary">
+									<option>Name (Ascending)</option>
+									<option>Name (Descending)</option>
+									<option>CMC (Ascending)</option>
+									<option>CMC (Descending)</option>
+									<option>Color (Ascending)</option>
+									<option>Color (Descending)</option>
+									<option>Power (Ascending)</option>
+									<option>Power (Descending)</option>
+									<option>Toughness (Ascending)</option>
+									<option>Toughness (Descending)</option>
+									<option>Loyalty (Ascending)</option>
+									<option>Loyalty (Descending)</option>
 								</select>
 							</div>
 						</div>
@@ -119,7 +158,7 @@
 				<div class="col-sm-8">
 					<div>
 						<h2 id="results-count"></h2>
-						<div class="row">
+						<div id="pagination-top" class="row">
 							<button type="button" class="btn btn-primary col" id="first">
 								First
 							</button>
@@ -137,7 +176,7 @@
 						<div id="results"></div>
 						<hr />
 
-						<div class="row">
+						<div id="pagination-bottom" class="row">
 							<button type="button" class="btn btn-primary col" id="first-bottom">
 								First
 							</button>
