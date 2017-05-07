@@ -23,6 +23,7 @@ function simplifyFormats(originalCard){
     return formats;
 }
 
+
 function modifyCard(originalCard){
     let card = {};
     card.name = originalCard.name;
@@ -34,6 +35,7 @@ function modifyCard(originalCard){
     card.power = originalCard.power;
     card.toughness = originalCard.toughness;
     card.loyalty = originalCard.loyalty;
+    card.colorIdentity = originalCard.colorIdentity;
 
     let colorNameToSymbol = {
         "White" : "W",
@@ -47,6 +49,7 @@ function modifyCard(originalCard){
     if (originalCard.colors !== undefined){
         card.colors = originalCard.colors.map(old => colorNameToSymbol[old])
     }
+
 
     if (originalCard.names && originalCard.names.length > 1) {
         if (originalCard.layout === "split") {

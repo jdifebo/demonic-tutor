@@ -14,7 +14,7 @@ let state = {
 			G: false,
 			excludeUnselected: false,
 			requireAll: false,
-			colorIdentity: false
+			colorIdentity: false,
 		},
 		format: "Vintage",
 		sort: [],
@@ -151,24 +151,25 @@ function callAjax(url, callback) {
 }
 
 function createColorMatcherFunction() {
+	let cardColors = card => state.inputs.colors.colorIdentity ? card.colorIdentity : card.colors
 	let colorMatcher;
 	if (state.inputs.colors.excludeUnselected && state.inputs.colors.requireAll) {
 		colorMatcher = card => {
-			return ["W", "U", "B", "R", "G"].filter(color => state.inputs.colors[color] === false).some(selectedColor => (card.colors && card.colors.includes(selectedColor))) == false
-				&& ["W", "U", "B", "R", "G"].filter(color => state.inputs.colors[color]).every(selectedColor => (card.colors && card.colors.includes(selectedColor)))
+			return ["W", "U", "B", "R", "G"].filter(color => state.inputs.colors[color] === false).some(selectedColor => (cardColors(card) && cardColors(card).includes(selectedColor))) == false
+				&& ["W", "U", "B", "R", "G"].filter(color => state.inputs.colors[color]).every(selectedColor => (cardColors(card) && cardColors(card).includes(selectedColor)))
 		};
 	}
 	else if (state.inputs.colors.excludeUnselected) {
-		colorMatcher = card => ["W", "U", "B", "R", "G"].filter(color => state.inputs.colors[color] === false).some(selectedColor => (card.colors && card.colors.includes(selectedColor))) == false
+		colorMatcher = card => ["W", "U", "B", "R", "G"].filter(color => state.inputs.colors[color] === false).some(selectedColor => (cardColors(card) && cardColors(card).includes(selectedColor))) == false
 	}
 	else if (["W", "U", "B", "R", "G"].some(color => state.inputs.colors[color]) == false) {
 		colorMatcher = card => true;
 	}
 	else if (state.inputs.colors.requireAll) {
-		colorMatcher = card => ["W", "U", "B", "R", "G"].filter(color => state.inputs.colors[color]).every(selectedColor => (card.colors && card.colors.includes(selectedColor)))
+		colorMatcher = card => ["W", "U", "B", "R", "G"].filter(color => state.inputs.colors[color]).every(selectedColor => (cardColors(card) && cardColors(card).includes(selectedColor)))
 	}
 	else {
-		colorMatcher = card => ["W", "U", "B", "R", "G"].filter(color => state.inputs.colors[color]).some(selectedColor => (card.colors && card.colors.includes(selectedColor)))
+		colorMatcher = card => ["W", "U", "B", "R", "G"].filter(color => state.inputs.colors[color]).some(selectedColor => (cardColors(card) && cardColors(card).includes(selectedColor)))
 	}
 	return colorMatcher;
 }
@@ -332,6 +333,11 @@ function sortAndRefilter() {
 		filterAndRenderCards();
 	});
 
+	document.getElementById("color-identity").addEventListener("change", function (event) {
+		state.inputs.colors.colorIdentity = event.target.checked;
+		filterAndRenderCards();
+	});
+
 	document.getElementById("format-input").addEventListener("change", function (event) {
 		state.inputs.format = event.target.value;
 		filterAndRenderCards();
@@ -365,6 +371,7 @@ function sortDropdownConverter(value){
 	});
 	state.inputs.colors.requireAll = document.getElementById("require-all").checked;
 	state.inputs.colors.excludeUnselected = document.getElementById("exclude-unselected").checked;
+	state.inputs.colors.colorIdentity = document.getElementById("color-identity").checked;
 	state.inputs.format = document.getElementById("format-input").value;
 	state.inputs.sort[0] = sortDropdownConverter(document.getElementById("sort-primary").value);
 	state.inputs.sort[1] = sortDropdownConverter(document.getElementById("sort-secondary").value);
