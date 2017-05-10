@@ -8,6 +8,7 @@
 	<!-- Bootstrap CSS -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ"
 	 crossorigin="anonymous">
+	<link href="styles.css" rel="stylesheet">
 
 
 	<link rel="shortcut icon" href="favicon.ico">
@@ -16,9 +17,19 @@
 
 <body>
 	<div>
+
 		<nav class="navbar navbar-inverse bg-inverse">
 			<div class="container">
-				<a class="navbar-brand" href="#">Navbar</a>
+				<a class="navbar-brand" href="#">Demonic Tutor</a>
+				<a class="nav-item nav-link active" href="#">Home <span class="sr-only">(current)</span></a>
+				<a class="nav-item nav-link" href="#">About</a>
+				<a class="nav-item nav-link" href="#">Contact</a>
+				<!--<div class="navbar-nav">
+					<a class="nav-item nav-link active" href="#">Home <span class="sr-only">(current)</span></a>
+					<a class="nav-item nav-link" href="#">Features</a>
+					<a class="nav-item nav-link" href="#">Pricing</a>
+					<a class="nav-item nav-link disabled" href="#">Disabled</a>
+				</div>-->
 			</div>
 		</nav>
 		<div class="container">
@@ -30,7 +41,7 @@
 						<div class="form-group row">
 							<label for="name-input" class="col-2 col-form-label">Name</label>
 							<div class="col-10">
-								<input class="form-control" type="text" id="name-input" />
+								<input class="form-control" type="text" id="name-input" autofocus/>
 							</div>
 						</div>
 						<div class="form-group row">
@@ -158,7 +169,7 @@
 				<div class="col-sm-8">
 					<div>
 						<h2 id="results-count"></h2>
-						<div id="pagination-top" class="row">
+						<div id="pagination-top" style="display: none" class="row">
 							<button type="button" class="btn btn-primary col" id="first">
 								First
 							</button>
@@ -176,7 +187,7 @@
 						<div id="results"></div>
 						<hr />
 
-						<div id="pagination-bottom" class="row">
+						<div id="pagination-bottom" style="display: none" class="row">
 							<button type="button" class="btn btn-primary col" id="first-bottom">
 								First
 							</button>
@@ -192,9 +203,8 @@
 						</div>
 					</div>
 				</div>
-				<hr />
-				The information presented on this site about Magic: The Gathering, both literal and graphical, is copyrighted by Wizards of the Coast.
-				This website is not produced, endorsed, supported, or affiliated with Wizards of the Coast. 
+				<hr /> The information presented on this site about Magic: The Gathering, both literal and graphical, is copyrighted by Wizards
+				of the Coast. This website is not produced, endorsed, supported, or affiliated with Wizards of the Coast.
 			</div>
 
 
