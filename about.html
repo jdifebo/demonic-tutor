@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<!-- Bootstrap CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ"
+	 crossorigin="anonymous">
+	<link href="styles.css" rel="stylesheet">
+
+
+	<link rel="shortcut icon" href="favicon.ico">
+	<title>About - Demonic Tutor</title>
+</head>
+
+<body>
+	<div>
+
+		<nav class="navbar navbar-inverse bg-inverse">
+			<div class="container">
+				<a class="navbar-brand" href="index.html">Demonic Tutor</a>
+				<a class="nav-item nav-link" href="index.html">Home</a>
+				<a class="nav-item nav-link active" href="about.html">About <span class="sr-only">(current)</span></a>
+				<a class="nav-item nav-link" href="contact.html">Contact</a>
+			</div>
+		</nav>
+		<br>
+		<div class="container narrow">
+			<h1>About</h1>
+			<p>
+				Demonic Tutor is a tool used to search through cards for the game <strong>Magic: The Gathering</strong>. The goal is
+				to have a simple-to-use interface with nearly instant results displayed on the same page. The site is capable of being
+				so fast because it loads the entire database of cards into memory, meaning that searching through cards does not need
+				to communicate with a server in order to update results.
+			</p>
+			<hr />
+			<h1>How it's built</h1>
+			<p>
+				Currently it's using plain JavaScript with no frameworks or libraries. I've played around with rebuilding this app using
+				various frameworks, but it's never been quite as fast. Using plain JavaScript gives me the most power and freedom, while
+				also minimizing page load time. Page load time is especially important since I have to load a 5MB JSON file, and I don't
+				want users to get bored waiting. The CSS is Bootstrap 4 Alpha, with a little bit of custom CSS.
+			</p>
+			<p>
+				THe card data comes from <a href="http://mtgjson.com/">MTG JSON</a>. I modify the JSON a little bit to make it easier
+				for my application to use, as well as removing fields that I don't use at all. You can see that in the source code if
+				you're super curious.
+			</p>
+			<hr />
+			<h1>Disclaimer</h1>
+			<p>
+				The information presented on this site about Magic: The Gathering, both literal and graphical, is copyrighted by Wizards
+				of the Coast. This website is not produced, endorsed, supported, or affiliated with Wizards of the Coast.
+			</p>
+			<p>
+				This site is still under construction and is provided with ABSOLUTELY NO WARRANTY. Things may be broken or out-of-date at
+				any given time.
+			</p>
+			<hr />
+		</div>
+
+		<script src="src/app.js"></script>
+</body>
+
+</html>
