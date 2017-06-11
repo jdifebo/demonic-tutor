@@ -1,7 +1,9 @@
 let state = {
 	allCards: [],
+	prices: {},
 	searchResults: [],
 	pageNumberZeroIndexed: 0,
+	// tabsToDisplay: [], // this is ignored for most cards, only used for things like split cards
 	inputs: {
 		name: "",
 		types: "",
@@ -30,6 +32,20 @@ function symbolToUrl(symbol) {
 function renderManaSymbol(symbol, size) {
 	var size = size || 24;
 	return "<img src=" + symbolToUrl(symbol) + " height=" + size + " alt=" + symbol + " />"
+}
+
+function getNameForTCGPlayer(card) {
+	if (card.layout == "normal" || card.layout == "leveler" || card.layout == "meld") {
+		return card.name;
+	}
+	else if (card.layout == "double-faced" || card.layout == "flip") {
+		return card.names[0];
+	}
+	// split and aftermath cards use both names separated by " // "
+	else if (card.layout == "split" || card.layout == "aftermath") {
+		return card.names[0] + " // " + card.names[1];
+	}
+	return undefined
 }
 
 /**
@@ -63,7 +79,42 @@ function renderText(text) {
 	}
 }
 
-function renderSingleCard(card) {
+/*
+ * This is really bad because now the stuff that's displayed doesn't actually match up with 
+ * our state that we defined above.  It's gross.  But it works.  And I don't want to change it. 
+ */
+function changeTab(cardIndex, cardName){
+	document.getElementById("results").children[cardIndex].outerHTML = renderSingleCard(state.multiNameCards[cardName], cardIndex);
+}
+
+function renderMultiCardTabs(card, cardIndex) {
+	if (card.names == undefined){
+		return "";
+	}
+
+	let navItems = card.names.map(name => {
+		let primaryText = name == card.name ? "btn-primary" : "btn-secondary"
+		return `
+		<div class="col">
+			<button type="button" class="btn ` + primaryText + ` btn-sm btn-block" onclick="changeTab(` + cardIndex + `, '` + name + `')">
+				` + name + `
+			</button>
+		</div>
+	`}).join("");
+
+	return `
+	<div class="card-header">
+		<div class="row">
+			` + navItems + `
+		</div>
+	</div>
+	`
+}
+
+function renderSingleCard(card, index) {
+	// if (card.name != state.tabsToDisplay[index]){
+	// 	alert("not displaying the right card, should be displaying " + state.tabsToDisplay[index]);
+	// }
 	let imgSrc = "http://gatherer.wizards.com/Handlers/Image.ashx?name=" + (card.image ? card.image : card.name) + "&type=card&.jpg";
 	let name = card.name;
 	let manaCostSymbols = card.manaCost ? card.manaCost.substring(1, card.manaCost.length - 1).split("}{") : [];
@@ -71,6 +122,22 @@ function renderSingleCard(card) {
 	let cmc = card.cmc || 0;
 	let type = card.type;
 	let ptOrLoyalty = "";
+	let printings;
+	let referralLink = "";
+	let tcgPriceInfo = state.prices[getNameForTCGPlayer(card)];
+	let multiCardTabs = renderMultiCardTabs(card, index);
+
+	if (tcgPriceInfo != undefined) {
+		referralLink = `<a target="_blank" href=` + tcgPriceInfo.link + `>$` + tcgPriceInfo.price + `</a>`
+	};
+
+	if (card.printings.length > 3) {
+		printings = card.printings[card.printings.length - 1] + " and " + (card.printings.length - 1) + " others"
+	}
+	else {
+		printings = card.printings.join(", ");
+	}
+
 	if (card.power !== undefined) {
 		ptOrLoyalty = "(" + card.power + "/" + card.toughness + ")"
 	}
@@ -86,10 +153,11 @@ function renderSingleCard(card) {
                     </div>
                     <div class="col-8">
                         <div class="card">
+							` + multiCardTabs + `
                             <div class="card-header">
                                 <div class="row">
                                     <div class="col-6">
-                                        <b>` + name + `</b>
+                                        <b><span style="float:none">` + name + `</span></b>
                                     </div>
                                     <div class="col-4">
                                         ` + manaCostImages + `
@@ -99,8 +167,14 @@ function renderSingleCard(card) {
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col">
+                                    <div class="col-6">
                                         ` + type + ` ` + ptOrLoyalty + `
+                                    </div>
+                                    <div class="col-4">
+                                        ` + printings + `
+                                    </div>
+                                    <div class="col-2">
+                                        ` + referralLink + `
                                     </div>
                                 </div>
                             </div>
@@ -109,8 +183,8 @@ function renderSingleCard(card) {
                             </div>
                         </div>
                     </div>
+					<br />
                 </div>
-				<br />
 	`
 }
 
@@ -119,15 +193,16 @@ function renderCards(state) {
 	let endCard = Math.min(startCard + cardsPerPage, state.searchResults.length);
 
 	let cardsToDisplay = state.searchResults.slice(startCard, endCard);
+	// state.tabsToDisplay = cardsToDisplay.map(card => card.name);
 
 	let renderedCards = cardsToDisplay.map(renderSingleCard).join("")
 
 	document.getElementById("results").innerHTML = renderedCards;
-	document.getElementById("results-count").innerHTML = 
-		"Showing " + 
+	document.getElementById("results-count").innerHTML =
+		"Showing " +
 		(state.searchResults.length > 0 ? (startCard + 1) + " - " + endCard + " of " : "")
-		 + state.searchResults.length + " results";
-	if (state.searchResults.length <= cardsPerPage){
+		+ state.searchResults.length + " results";
+	if (state.searchResults.length <= cardsPerPage) {
 		document.getElementById("pagination-top").style.display = "none";
 		document.getElementById("pagination-bottom").style.display = "none";
 	}
@@ -178,42 +253,42 @@ function sortFunction(c1, c2, sortCriteria) {
 	let field1;
 	let field2;
 	for (let i = 0; i < sortCriteria.length; i++) {
-		if (sortCriteria[i].by === "name"){
+		if (sortCriteria[i].by === "name") {
 			field1 = c1.name;	// All cards have names, that's one of the few things that's guaranteed
 			field2 = c2.name;
 		}
-		else if (sortCriteria[i].by === "color"){
+		else if (sortCriteria[i].by === "color") {
 			field1 = c1.colors === undefined ? "" : c1.colors.join("");
 			field2 = c2.colors === undefined ? "" : c2.colors.join("");
 		}
-		else if (sortCriteria[i].by === "cmc"){
+		else if (sortCriteria[i].by === "cmc") {
 			field1 = c1.cmc || 0;
 			field2 = c2.cmc || 0;
 		}
-		else if (sortCriteria[i].by === "power"){
+		else if (sortCriteria[i].by === "power") {
 			field1 = c1.power === "*" ? 0 : parseInt(c1.power);
 			field2 = c2.power === "*" ? 0 : parseInt(c2.power);
 		}
-		else if (sortCriteria[i].by === "toughness"){
+		else if (sortCriteria[i].by === "toughness") {
 			field1 = c1.toughness === "*" ? 0 : parseInt(c1.toughness);
 			field2 = c2.toughness === "*" ? 0 : parseInt(c2.toughness);
 		}
-		else if (sortCriteria[i].by === "loyalty"){
+		else if (sortCriteria[i].by === "loyalty") {
 			field1 = c1.loyalty === "X" ? 0 : parseInt(c1.loyalty);
 			field2 = c2.loyalty === "X" ? 0 : parseInt(c2.loyalty);
 		}
-		
+
 		/**
 		 * if doing a numerical sort, return all NaN values last regardless of
 		 * sort order.  That's what the first 3 checks are for
 		 */
-		if (Number.isNaN(field1) && Number.isNaN(field2)){
+		if (Number.isNaN(field1) && Number.isNaN(field2)) {
 			break;
 		}
-		else if (!Number.isNaN(field1) && Number.isNaN(field2)){
+		else if (!Number.isNaN(field1) && Number.isNaN(field2)) {
 			return -1;
 		}
-		else if (Number.isNaN(field1) && !Number.isNaN(field2)){
+		else if (Number.isNaN(field1) && !Number.isNaN(field2)) {
 			return 1;
 		}
 		else if (field1 > field2) {
@@ -354,12 +429,12 @@ function sortAndRefilter() {
 	});
 })();
 
-function sortDropdownConverter(value){
+function sortDropdownConverter(value) {
 	let parts = value.split(" ");
 	return {
-			by : parts[0].toLowerCase(), 
-			order : parts[1] === "(Ascending)" ? 1 : -1
-		};
+		by: parts[0].toLowerCase(),
+		order: parts[1] === "(Ascending)" ? 1 : -1
+	};
 }
 
 (function setInitialState() {
@@ -379,6 +454,16 @@ function sortDropdownConverter(value){
 
 callAjax("resources/cards.json", responseText => {
 	state.allCards = JSON.parse(responseText);
+	state.multiNameCards = {};
+	state.allCards.filter(card => card.names != undefined).forEach(card => state.multiNameCards[card.name] = card);
+	// localStorage.allCards = state.allCards;
 	sortAndRefilter();
+
+	// Prices get loaded from a separate JSON file.  Since we don't use them for sorting criteria (yet),
+	// we can just rerender our results once we get price data to show prices too!
+	callAjax("resources/SimplifiedPrices.json", responseText => {
+		state.prices = JSON.parse(responseText);
+		renderCards(state);
+	});
 });
 

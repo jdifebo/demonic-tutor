@@ -1,3 +1,5 @@
+Loading message
+
 Individual Card Display:
     versions released
     format legality
@@ -6,3 +8,5 @@ Individual Card Display:
 Filtering:
     Power/Toughness Search
     more stuff too
+
+when searching by color identity, auto check "exclude unselected" and disable

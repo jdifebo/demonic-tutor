@@ -1,3 +1,10 @@
 resources/AllCards.json
 resources/AllCards-x.json
+resources/AllSets.json
 resources/test.js
+resources/node_modules/
+resources/errors.txt
+resources/getPrices*
+resources/prices.json
+resources/rulings.json
+resources/SimplifiedPrices.json

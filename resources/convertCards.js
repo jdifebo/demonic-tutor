@@ -36,6 +36,9 @@ function modifyCard(originalCard){
     card.toughness = originalCard.toughness;
     card.loyalty = originalCard.loyalty;
     card.colorIdentity = originalCard.colorIdentity;
+    card.printings = originalCard.printings;
+    card.layout = originalCard.layout;
+    card.names = originalCard.names;
 
     let colorNameToSymbol = {
         "White" : "W",
@@ -52,7 +55,7 @@ function modifyCard(originalCard){
 
 
     if (originalCard.names && originalCard.names.length > 1) {
-        if (originalCard.layout === "split") {
+        if (originalCard.layout === "split" || originalCard.layout == "aftermath") {
             card.image = originalCard.names.join(" // ");
         }
     }
