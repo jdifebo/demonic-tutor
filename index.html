@@ -33,9 +33,9 @@
 				</div>-->
 			</div>
 		</nav>
-		<div class="container">
+		<div class="container-fluid">
 			<div class="row">
-				<div class="col-sm-4">
+				<div class="col-md-4">
 					<div>
 						<h2>Enter Search Terms:</h2>
 						<hr />
@@ -74,31 +74,31 @@
 							<div class="col">
 								<label class="form-check-label">
 									<input id="W" type="checkbox" class="form-check-input">
-									<img src="resources/symbols/w.svg" style="max-width:100%">
+									<img src="resources/symbols/w.svg" style="max-width:26px">
 								</label>
 							</div>
 							<div class="col">
 								<label class="form-check-label">
 									<input id="U" type="checkbox" class="form-check-input">
-									<img src="resources/symbols/u.svg" style="max-width:100%">
+									<img src="resources/symbols/u.svg" style="max-width:26px">
 								</label>
 							</div>
 							<div class="col">
 								<label class="form-check-label">
 									<input id="B" type="checkbox" class="form-check-input">
-									<img src="resources/symbols/b.svg" style="max-width:100%">
+									<img src="resources/symbols/b.svg" style="max-width:26px">
 								</label>
 							</div>
 							<div class="col">
 								<label class="form-check-label">
 									<input id="R" type="checkbox" class="form-check-input">
-									<img src="resources/symbols/r.svg" style="max-width:100%">
+									<img src="resources/symbols/r.svg" style="max-width:26px">
 								</label>
 							</div>
 							<div class="col">
 								<label class="form-check-label">
 									<input id="G" type="checkbox" class="form-check-input">
-									<img src="resources/symbols/g.svg" style="max-width:100%">
+									<img src="resources/symbols/g.svg" style="max-width:26px">
 								</label>
 							</div>
 						</div>
@@ -167,7 +167,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="col-sm-8">
+				<div class="col-md-8">
 					<div>
 						<h2 id="results-count"></h2>
 						<div id="pagination-top" style="display: none" class="row">
@@ -185,7 +185,9 @@
 							</button>
 						</div>
 						<hr />
-						<div id="results"></div>
+						<div id="results">
+							<div class="loader">Loading...</div>
+						</div>
 						<hr />
 
 						<div id="pagination-bottom" style="display: none" class="row">
