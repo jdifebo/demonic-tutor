@@ -3,7 +3,6 @@ let state = {
 	prices: {},
 	searchResults: [],
 	pageNumberZeroIndexed: 0,
-	// tabsToDisplay: [], // this is ignored for most cards, only used for things like split cards
 	inputs: {
 		name: "",
 		types: "",
@@ -83,11 +82,23 @@ function renderText(text) {
  * This is really bad because now the stuff that's displayed doesn't actually match up with 
  * our state that we defined above.  It's gross.  But it works.  And I don't want to change it. 
  */
-function changeTab(cardIndex, cardName){
-	document.getElementById("results").children[cardIndex].outerHTML = renderSingleCard(state.multiNameCards[cardName], cardIndex);
+function changeTab(element, cardName){
+	element.outerHTML = renderSingleCard(state.multiNameCards[cardName]);
+	addButtonEventListeners();
 }
 
-function renderMultiCardTabs(card, cardIndex) {
+function addButtonEventListeners(){
+	var buttons = document.getElementsByClassName("multi-card-button");
+	for (let i = 0; i < buttons.length; i++){
+		buttons[i].addEventListener("click", event => {
+			// LOL
+			let parentCardSection = event.currentTarget.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement;
+			changeTab(parentCardSection, event.currentTarget.innerHTML.trim());
+		});
+	}
+}
+
+function renderMultiCardTabs(card) {
 	if (card.names == undefined){
 		return "";
 	}
@@ -96,9 +107,8 @@ function renderMultiCardTabs(card, cardIndex) {
 		let primaryText = name == card.name ? "btn-primary" : "btn-secondary"
 		return `
 		<div class="col">
-			<button type="button" class="btn ` + primaryText + ` btn-sm btn-block" onclick="changeTab(` + cardIndex + `, '` + name + `')">
-				` + name + `
-			</button>
+			<button type="button" class="btn ` + primaryText + ` btn-sm btn-block multi-card-button">
+				` + name + `</button>
 		</div>
 	`}).join("");
 
@@ -111,10 +121,7 @@ function renderMultiCardTabs(card, cardIndex) {
 	`
 }
 
-function renderSingleCard(card, index) {
-	// if (card.name != state.tabsToDisplay[index]){
-	// 	alert("not displaying the right card, should be displaying " + state.tabsToDisplay[index]);
-	// }
+function renderSingleCard(card) {
 	let imgSrc = "http://gatherer.wizards.com/Handlers/Image.ashx?name=" + (card.image ? card.image : card.name) + "&type=card&.jpg";
 	let name = card.name;
 	let manaCostSymbols = card.manaCost ? card.manaCost.substring(1, card.manaCost.length - 1).split("}{") : [];
@@ -126,7 +133,7 @@ function renderSingleCard(card, index) {
 	let printingsHover = card.printings.map(code => sets[code]).join("\n");
 	let referralLink = "";
 	let tcgPriceInfo = state.prices[getNameForTCGPlayer(card)];
-	let multiCardTabs = renderMultiCardTabs(card, index);
+	let multiCardTabs = renderMultiCardTabs(card);
 
 	if (tcgPriceInfo != undefined) {
 		referralLink = `<a target="_blank" href=` + tcgPriceInfo.link + `>$` + tcgPriceInfo.price + `</a>`
@@ -211,6 +218,7 @@ function renderCards(state) {
 		document.getElementById("pagination-top").style.display = "";
 		document.getElementById("pagination-bottom").style.display = "";
 	}
+	addButtonEventListeners();
 }
 
 function callAjax(url, callback) {
@@ -481,8 +489,8 @@ var sets = {
   "LEG": "Legends",
   "DRK": "The Dark",
   "FEM": "Fallen Empires",
-  "pMEI": "Media Inserts",
-  "pLGM": "Legend Membership",
+  "pMEI": "Media Promos",
+  "pLGM": "Arena Promos",
   "4ED": "Fourth Edition",
   "ICE": "Ice Age",
   "CHR": "Chronicles",
@@ -504,7 +512,7 @@ var sets = {
   "TMP": "Tempest",
   "STH": "Stronghold",
   "PO2": "Portal Second Age",
-  "pJGP": "Judge Gift Program",
+  "pJGP": "Judge Promos",
   "EXO": "Exodus",
   "UGL": "Unglued",
   "pALP": "Asia Pacific Land Program",
@@ -549,16 +557,16 @@ var sets = {
   "BOK": "Betrayers of Kamigawa",
   "SOK": "Saviors of Kamigawa",
   "9ED": "9th Edition",
-  "RAV": "Ravnica: City of Guilds",
+  "RAV": "Ravnica",
   "p2HG": "Two-Headed Giant Tournament",
   "pGTW": "Gateway",
   "GPT": "Guildpact",
   "pCMP": "Champs and States",
   "DIS": "Dissension",
   "CSP": "Coldsnap",
-  "CST": "Coldsnap Theme Decks",
+  "CST": "Coldsnap Theme Deck Reprints",
   "TSP": "Time Spiral",
-  "TSB": "Time Spiral \"Timeshifted\"",
+  "TSB": "Timeshifted",
   "pHHO": "Happy Holidays",
   "PLC": "Planar Chaos",
   "pPRO": "Pro Tour",
@@ -613,7 +621,7 @@ var sets = {
   "DKA": "Dark Ascension",
   "DDI": "Duel Decks: Venser vs. Koth",
   "AVR": "Avacyn Restored",
-  "PC2": "Planechase 2012 Edition",
+  "PC2": "Planechase 2012",
   "M13": "Magic 2013 (M13)",
   "V12": "From the Vault: Realms",
   "DDJ": "Duel Decks: Izzet vs. Golgari",
@@ -632,12 +640,12 @@ var sets = {
   "BNG": "Born of the Gods",
   "DDM": "Duel Decks: Jace vs. Vraska",
   "JOU": "Journey into Nyx",
-  "MD1": "Modern Event Deck 2014",
-  "CNS": "Magic: The Gathering—Conspiracy",
+  "MD1": "Magic Modern Event Deck",
+  "CNS": "Conspiracy",
   "VMA": "Vintage Masters",
   "M15": "Magic 2015 (M15)",
-  "CPK": "Clash Pack",
-  "V14": "From the Vault: Annihilation (2014)",
+  "CPK": "Unique and Miscellaneous Promos",
+  "V14": "From the Vault: Annihilation",
   "DDN": "Duel Decks: Speed vs. Cunning",
   "KTK": "Khans of Tarkir",
   "C14": "Commander 2014",
@@ -650,7 +658,7 @@ var sets = {
   "DDO": "Duel Decks: Elspeth vs. Kiora",
   "DTK": "Dragons of Tarkir",
   "TPR": "Tempest Remastered",
-  "MM2": "Modern Masters 2015 Edition",
+  "MM2": "Modern Masters 2015",
   "ORI": "Magic Origins",
   "V15": "From the Vault: Angels",
   "DDP": "Duel Decks: Zendikar vs. Eldrazi",
@@ -671,7 +679,7 @@ var sets = {
   "C16": "Commander 2016",
   "PCA": "Planechase Anthology",
   "AER": "Aether Revolt",
-  "MM3": "Modern Masters 2017 Edition",
+  "MM3": "Modern Masters 2017",
   "DDS": "Duel Decks: Mind vs. Might",
   "AKH": "Amonkhet",
   "MPS_AKH": "Masterpiece Series: Amonkhet Invocations"
