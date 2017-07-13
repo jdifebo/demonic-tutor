@@ -682,5 +682,6 @@ var sets = {
   "MM3": "Modern Masters 2017",
   "DDS": "Duel Decks: Mind vs. Might",
   "AKH": "Amonkhet",
-  "MPS_AKH": "Masterpiece Series: Amonkhet Invocations"
-};
+  "MPS_AKH": "Masterpiece Series: Amonkhet Invocations",
+  "HOU": "Hour of Devastation"
+}
