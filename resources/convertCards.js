@@ -9,11 +9,20 @@ let original = require("./AllCards-x.json");
 
 function simplifyFormats(originalCard){
     if (originalCard.legalities === undefined){
-        if (originalCard.printings.includes("C16")){
+        if (originalCard.printings.includes("C17")){
             return {
                 "Commander": "Legal",
                 "Legacy": "Legal",
                 "Vintage": "Legal"
+            }
+        }
+        else if (originalCard.printings.includes("XLN")){
+            return {
+                "Commander": "Legal",
+                "Legacy": "Legal",
+                "Vintage": "Legal",
+                "Standard": "Legal",
+                "Modern": "Legal"
             }
         }
         return undefined;
@@ -59,8 +68,17 @@ function modifyCard(originalCard){
             card.image = originalCard.names.join(" // ");
         }
     }
-    else {
-        // delete card.imageName;
+
+    // I want to treat meld cards as having 3 names.  Since there are only a handful of cards with this ability, it'll be easiest
+    // to just hardcode the necessary changes.  If/when meld returns, this will need to be updated.
+    if (card.name == "Bruna, the Fading Light" || card.name == "Gisela, the Broken Blade" || card.name == "Brisela, Voice of Nightmares"){
+        card.names = ["Bruna, the Fading Light", "Gisela, the Broken Blade", "Brisela, Voice of Nightmares"];
+    }
+    else if (card.name == "Hanweir Garrison" || card.name == "Hanweir Battlements" || card.name == "Hanweir, the Writhing Township"){
+        card.names = ["Hanweir Garrison", "Hanweir Battlements", "Hanweir, the Writhing Township"]
+    }
+    else if (card.name == "Midnight Scavengers" || card.name == "Graf Rats" || card.name == "Chittering Host"){
+        card.names = ["Midnight Scavengers", "Graf Rats","Chittering Host"]
     }
     return card;
 }
