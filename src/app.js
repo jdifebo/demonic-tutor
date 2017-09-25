@@ -18,6 +18,8 @@ let state = {
 			colorIdentity: false,
 		},
 		format: "Vintage",
+		power1: -1,
+		power2: 15,
 		sort: [],
 	}
 }
@@ -320,13 +322,27 @@ function filterAndRenderCards() {
 			(formats[state.inputs.format] === "Legal" || formats[state.inputs.format] === "Restricted")) || state.inputs.format === "All"
 	}
 
+	function powerRangeChecker(power){
+		let bigger = Math.max(state.inputs.power1, state.inputs.power2);
+		let smaller = Math.min(state.inputs.power1, state.inputs.power2);
+		if (smaller == -1 && bigger == 15){
+			return true;
+		} else if (power === undefined){
+			return false;
+		}
+		else {
+			return smaller <= power && power <= bigger
+		}
+	}
+
 	state.searchResults = state.allCards
 		.filter(card =>
 			nameFilter.test(card.name) &&
 			textFilter.test(card.text) &&
 			typesFilters.map(typeFilter => typeFilter.test(card.type)).reduce((b1, b2) => b1 && b2, true) &&
 			colorMatcher(card) &&
-			formatMatcher(card.formats)
+			formatMatcher(card.formats) &&
+			powerRangeChecker(card.power)
 		);
 	state.pageNumberZeroIndexed = 0;
 	renderCards(state);
@@ -335,6 +351,20 @@ function filterAndRenderCards() {
 function sortAndRefilter() {
 	state.allCards.sort((c1, c2) => sortFunction(c1, c2, state.inputs.sort));
 	filterAndRenderCards();
+}
+
+function modifyPowerLabel() {
+	let bigger = Math.max(state.inputs.power1, state.inputs.power2);
+	let smaller = Math.min(state.inputs.power1, state.inputs.power2);
+	let power = "";
+	if (smaller == -1 && bigger == 15){
+		power = "Any";
+	} else if (smaller == bigger){
+		power = smaller;
+	} else {
+		power = smaller + " to " + bigger;
+	}
+	document.getElementById("power-label").innerHTML = "Power: " + power;
 }
 
 (function addAllEventListeners() {
@@ -435,6 +465,17 @@ function sortAndRefilter() {
 		sortAndRefilter();
 	});
 
+	document.getElementById("power-input").addEventListener("change", function (event) {
+		state.inputs.power1 = event.target.value;
+		modifyPowerLabel();
+		filterAndRenderCards();
+	});
+	document.getElementById("power-input2").addEventListener("change", function (event) {
+		state.inputs.power2 = event.target.value;
+		modifyPowerLabel();
+		filterAndRenderCards();
+	});
+
 	document.getElementById("results").addEventListener("click", function (event) {
 		// We essentially want event listeners on buttons.  But we're in a pickle because buttons
 		// constantly get deleted and readded to the dom.  It's annoying to have to re-attach event
@@ -468,6 +509,9 @@ function sortDropdownConverter(value) {
 	state.inputs.format = document.getElementById("format-input").value;
 	state.inputs.sort[0] = sortDropdownConverter(document.getElementById("sort-primary").value);
 	state.inputs.sort[1] = sortDropdownConverter(document.getElementById("sort-secondary").value);
+	state.inputs.power1 = document.getElementById("power-input").value;
+	state.inputs.power2 = document.getElementById("power-input2").value;
+	modifyPowerLabel();
 })();
 
 callAjax("resources/cards.json", responseText => {
