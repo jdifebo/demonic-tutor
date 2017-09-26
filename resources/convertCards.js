@@ -36,7 +36,7 @@ function simplifyFormats(originalCard){
 function modifyCard(originalCard){
     let card = {};
     card.name = originalCard.name;
-    card.cmc = originalCard.cmc;
+    card.cmc = originalCard.cmc || 0;
     card.type = originalCard.type;
     card.text = originalCard.text;
     card.formats = simplifyFormats(originalCard);

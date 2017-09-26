@@ -20,6 +20,10 @@ let state = {
 		format: "Vintage",
 		power1: -1,
 		power2: 15,
+		toughness1: -1,
+		toughness2: 15,
+		cmc1: 0,
+		cmc2: 16,
 		sort: [],
 	}
 }
@@ -129,7 +133,7 @@ function renderSingleCard(card) {
 	let name = card.name;
 	let manaCostSymbols = card.manaCost ? card.manaCost.substring(1, card.manaCost.length - 1).split("}{") : [];
 	let manaCostImages = manaCostSymbols.map(symbol => renderManaSymbol(symbol)).join("");
-	let cmc = card.cmc || 0;
+	let cmc = card.cmc;
 	let type = card.type;
 	let ptOrLoyalty = "";
 	let printingsText;
@@ -324,6 +328,18 @@ function filterAndRenderCards() {
 			(formats[state.inputs.format] === "Legal" || formats[state.inputs.format] === "Restricted")) || state.inputs.format === "All"
 	}
 
+	function cmcRangeChecker(cmc){
+		let bigger = Math.max(state.inputs.cmc1, state.inputs.cmc2);
+		let smaller = Math.min(state.inputs.cmc1, state.inputs.cmc2);
+		if (smaller == 0 && bigger == 16){
+			return true;
+		} else if (cmc === undefined){
+			return false;
+		}
+		else {
+			return smaller <= cmc && cmc <= bigger
+		}
+	}
 	function powerRangeChecker(power){
 		let bigger = Math.max(state.inputs.power1, state.inputs.power2);
 		let smaller = Math.min(state.inputs.power1, state.inputs.power2);
@@ -336,6 +352,18 @@ function filterAndRenderCards() {
 			return smaller <= power && power <= bigger
 		}
 	}
+	function toughnessRangeChecker(toughness){
+		let bigger = Math.max(state.inputs.toughness1, state.inputs.toughness2);
+		let smaller = Math.min(state.inputs.toughness1, state.inputs.toughness2);
+		if (smaller == -1 && bigger == 15){
+			return true;
+		} else if (toughness === undefined){
+			return false;
+		}
+		else {
+			return smaller <= toughness && toughness <= bigger
+		}
+	}
 
 	state.searchResults = state.allCards
 		.filter(card =>
@@ -344,7 +372,9 @@ function filterAndRenderCards() {
 			typesFilters.map(typeFilter => typeFilter.test(card.type)).reduce((b1, b2) => b1 && b2, true) &&
 			colorMatcher(card) &&
 			formatMatcher(card.formats) &&
-			powerRangeChecker(card.power)
+			cmcRangeChecker(card.cmc) && 
+			powerRangeChecker(card.power) &&
+			toughnessRangeChecker(card.toughness)
 		);
 	state.pageNumberZeroIndexed = 0;
 	renderCards(state);
@@ -367,6 +397,34 @@ function modifyPowerLabel() {
 		power = smaller + " to " + bigger;
 	}
 	document.getElementById("power-label").innerHTML = "Power: " + power;
+}
+
+function modifyToughnessLabel() {
+	let bigger = Math.max(state.inputs.toughness1, state.inputs.toughness2);
+	let smaller = Math.min(state.inputs.toughness1, state.inputs.toughness2);
+	let toughness = "";
+	if (smaller == -1 && bigger == 15){
+		toughness = "Any";
+	} else if (smaller == bigger){
+		toughness = smaller;
+	} else {
+		toughness = smaller + " to " + bigger;
+	}
+	document.getElementById("toughness-label").innerHTML = "Toughness: " + toughness;
+}
+
+function modifyCmcLabel() {
+	let bigger = Math.max(state.inputs.cmc1, state.inputs.cmc2);
+	let smaller = Math.min(state.inputs.cmc1, state.inputs.cmc2);
+	let cmc = "";
+	if (smaller == 0 && bigger == 16){
+		cmc = "Any";
+	} else if (smaller == bigger){
+		cmc = smaller;
+	} else {
+		cmc = smaller + " to " + bigger;
+	}
+	document.getElementById("cmc-label").innerHTML = "CMC: " + cmc;
 }
 
 (function addAllEventListeners() {
@@ -467,7 +525,26 @@ function modifyPowerLabel() {
 		sortAndRefilter();
 	});
 
-	document.getElementById("power-input").addEventListener("change", function (event) {
+	document.getElementById("cmc-input1").addEventListener("change", function (event) {
+		state.inputs.cmc1 = event.target.value;
+		modifyCmcLabel();
+		filterAndRenderCards();
+	});
+	document.getElementById("cmc-input2").addEventListener("change", function (event) {
+		state.inputs.cmc2 = event.target.value;
+		modifyCmcLabel();
+		filterAndRenderCards();
+	});
+	document.getElementById("cmc-input1").addEventListener("input", function (event) {
+		state.inputs.cmc1 = event.target.value;
+		modifyCmcLabel();
+	});
+	document.getElementById("cmc-input2").addEventListener("input", function (event) {
+		state.inputs.cmc2 = event.target.value;
+		modifyCmcLabel();
+	});
+
+	document.getElementById("power-input1").addEventListener("change", function (event) {
 		state.inputs.power1 = event.target.value;
 		modifyPowerLabel();
 		filterAndRenderCards();
@@ -476,6 +553,33 @@ function modifyPowerLabel() {
 		state.inputs.power2 = event.target.value;
 		modifyPowerLabel();
 		filterAndRenderCards();
+	});
+	document.getElementById("power-input1").addEventListener("input", function (event) {
+		state.inputs.power1 = event.target.value;
+		modifyPowerLabel();
+	});
+	document.getElementById("power-input2").addEventListener("input", function (event) {
+		state.inputs.power2 = event.target.value;
+		modifyPowerLabel();
+	});
+
+	document.getElementById("toughness-input1").addEventListener("change", function (event) {
+		state.inputs.toughness1 = event.target.value;
+		modifyToughnessLabel();
+		filterAndRenderCards();
+	});
+	document.getElementById("toughness-input2").addEventListener("change", function (event) {
+		state.inputs.toughness2 = event.target.value;
+		modifyToughnessLabel();
+		filterAndRenderCards();
+	});
+	document.getElementById("toughness-input1").addEventListener("input", function (event) {
+		state.inputs.toughness1 = event.target.value;
+		modifyToughnessLabel();
+	});
+	document.getElementById("toughness-input2").addEventListener("input", function (event) {
+		state.inputs.toughness2 = event.target.value;
+		modifyToughnessLabel();
 	});
 
 	document.getElementById("results").addEventListener("click", function (event) {
@@ -510,9 +614,15 @@ function sortDropdownConverter(value) {
 	state.inputs.format = document.getElementById("format-input").value;
 	state.inputs.sort[0] = sortDropdownConverter(document.getElementById("sort-primary").value);
 	state.inputs.sort[1] = sortDropdownConverter(document.getElementById("sort-secondary").value);
-	state.inputs.power1 = document.getElementById("power-input").value;
+	state.inputs.cmc1 = document.getElementById("cmc-input1").value;
+	state.inputs.cmc2 = document.getElementById("cmc-input2").value;
+	modifyCmcLabel();
+	state.inputs.power1 = document.getElementById("power-input1").value;
 	state.inputs.power2 = document.getElementById("power-input2").value;
 	modifyPowerLabel();
+	state.inputs.toughness1 = document.getElementById("toughness-input1").value;
+	state.inputs.toughness2 = document.getElementById("toughness-input2").value;
+	modifyToughnessLabel();
 })();
 
 callAjax("resources/cards.json", responseText => {
