@@ -84,8 +84,10 @@ function renderText(text) {
  * This is really bad because now the stuff that's displayed doesn't actually match up with 
  * our state that we defined above.  It's gross.  But it works.  And I don't want to change it. 
  */
-function changeTab(element, cardName){
-	element.outerHTML = renderSingleCard(state.multiNameCards[cardName]);
+function changeTab(button){
+	let parentCardSection = button.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement;
+	let cardName = button.innerHTML.trim();
+	parentCardSection.outerHTML = renderSingleCard(state.multiNameCards[cardName]);
 }
 
 
@@ -481,9 +483,8 @@ function modifyPowerLabel() {
 		// constantly get deleted and readded to the dom.  It's annoying to have to re-attach event
 		// listeners every time, so instead we have one listener on the parent element and then test
 		// to see if a click was on a button or not
-		if (event.originalTarget.tagName == "BUTTON"){
-			let parentCardSection = event.originalTarget.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement;
-			changeTab(parentCardSection, event.originalTarget.innerHTML.trim());
+		if (event.target.tagName == "BUTTON"){
+			changeTab(event.target);
 		}
 	});
 })();

@@ -16,6 +16,7 @@
     max-width: 1140px;
 }
 
+/* https://stackoverflow.com/questions/4753946/html5-slider-with-two-inputs-possible/31083391#31083391 */
 .double-slide-container {
   position: relative;
   width: 100%;
