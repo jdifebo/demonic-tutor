@@ -127,6 +127,14 @@ function debug(card){
 	})
 }
 
+function formatPrice(price) {
+	result = price;
+	if(!price.match(/.*\.../)) {
+		result += "0";
+	}
+	return result;
+}
+
 function renderSingleCard(card) {
 	// debug(card);
 	let imgSrc = "http://gatherer.wizards.com/Handlers/Image.ashx?name=" + (card.image ? card.image : card.name) + "&type=card&.jpg";
@@ -143,7 +151,7 @@ function renderSingleCard(card) {
 	let multiCardTabs = renderMultiCardTabs(card);
 
 	if (tcgPriceInfo != undefined) {
-		referralLink = `<a target="_blank" href=` + tcgPriceInfo.link + `>$` + tcgPriceInfo.price + `</a>`
+		referralLink = `<a target="_blank" href=` + tcgPriceInfo.link + `>$` + formatPrice(tcgPriceInfo.price) + `</a>`
 	};
 
 	if (card.printings.length > 3) {
