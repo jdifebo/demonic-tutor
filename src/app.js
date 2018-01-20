@@ -1,6 +1,5 @@
 let state = {
 	allCards: [],
-	prices: {},
 	searchResults: [],
 	pageNumberZeroIndexed: 0,
 	inputs: {
@@ -24,6 +23,8 @@ let state = {
 		toughness2: 15,
 		cmc1: 0,
 		cmc2: 16,
+		price1: 0,
+		price2: 2000,
 		sort: [],
 	}
 }
@@ -139,7 +140,7 @@ function renderSingleCard(card) {
 	let printingsText;
 	let printingsHover = card.printings.map(code => sets[code] || code).join("\n");
 	let referralLink = "";
-	let tcgPriceInfo = state.prices[getNameForTCGPlayer(card)];
+	let tcgPriceInfo = card.priceInfo;
 	let multiCardTabs = renderMultiCardTabs(card);
 
 	if (tcgPriceInfo != undefined) {
@@ -292,6 +293,10 @@ function sortFunction(c1, c2, sortCriteria) {
 			field1 = c1.loyalty === "X" ? 0 : parseInt(c1.loyalty);
 			field2 = c2.loyalty === "X" ? 0 : parseInt(c2.loyalty);
 		}
+		else if (sortCriteria[i].by === "price") {
+			field1 = c1.price ? c1.price.price : NaN;
+			field2 = c2.price ? c2.price.price : NaN;
+		}
 
 		/**
 		 * if doing a numerical sort, return all NaN values last regardless of
@@ -364,6 +369,19 @@ function filterAndRenderCards() {
 			return smaller <= toughness && toughness <= bigger
 		}
 	}
+	
+	function priceRangeChecker(price){
+		let bigger = Math.max(state.inputs.price1, state.inputs.price2);
+		let smaller = Math.min(state.inputs.price1, state.inputs.price2);
+		if (smaller == 0 && bigger == 2000){
+			return true;
+		} else if (price === undefined){
+			return false;
+		}
+		else {
+			return smaller <= price && price <= bigger
+		}
+	}
 
 	state.searchResults = state.allCards
 		.filter(card =>
@@ -374,7 +392,8 @@ function filterAndRenderCards() {
 			formatMatcher(card.formats) &&
 			cmcRangeChecker(card.cmc) && 
 			powerRangeChecker(card.power) &&
-			toughnessRangeChecker(card.toughness)
+			toughnessRangeChecker(card.toughness) &&
+			priceRangeChecker(card.priceInfo ? card.priceInfo.price : undefined)
 		);
 	state.pageNumberZeroIndexed = 0;
 	renderCards(state);
@@ -411,6 +430,20 @@ function modifyToughnessLabel() {
 		toughness = smaller + " to " + bigger;
 	}
 	document.getElementById("toughness-label").innerHTML = "Toughness: " + toughness;
+}
+
+function modifyPriceLabel() {
+	let bigger = Math.max(state.inputs.price1, state.inputs.price2);
+	let smaller = Math.min(state.inputs.price1, state.inputs.price2);
+	let price = "";
+	if (smaller == 0 && bigger == 2000){
+		price = "Any";
+	} else if (smaller == bigger){
+		price = smaller;
+	} else {
+		price = smaller + " to " + bigger;
+	}
+	document.getElementById("price-label").innerHTML = "Price: " + price;
 }
 
 function modifyCmcLabel() {
@@ -582,6 +615,25 @@ function modifyCmcLabel() {
 		modifyToughnessLabel();
 	});
 
+	document.getElementById("price-input1").addEventListener("change", function (event) {
+		state.inputs.price1 = scalePrices(event.target.value);
+		modifyPriceLabel();
+		filterAndRenderCards();
+	});
+	document.getElementById("price-input2").addEventListener("change", function (event) {
+		state.inputs.price2 = scalePrices(event.target.value);
+		modifyPriceLabel();
+		filterAndRenderCards();
+	});
+	document.getElementById("price-input1").addEventListener("input", function (event) {
+		state.inputs.price1 = scalePrices(event.target.value);
+		modifyPriceLabel();
+	});
+	document.getElementById("price-input2").addEventListener("input", function (event) {
+		state.inputs.price2 = scalePrices(event.target.value);
+		modifyPriceLabel();
+	});
+
 	document.getElementById("results").addEventListener("click", function (event) {
 		// We essentially want event listeners on buttons.  But we're in a pickle because buttons
 		// constantly get deleted and readded to the dom.  It's annoying to have to re-attach event
@@ -592,6 +644,23 @@ function modifyCmcLabel() {
 		}
 	});
 })();
+
+function scalePrices(rawInput){
+	scale = {
+		0: 0,
+		1: .25,
+		2: 1,
+		3: 2.50,
+		4: 5,
+		5: 10,
+		6: 25,
+		7: 50,
+		8: 100,
+		9: 500,
+		10: 2000,
+	}
+	return scale[rawInput];
+}
 
 function sortDropdownConverter(value) {
 	let parts = value.split(" ");
@@ -623,6 +692,9 @@ function sortDropdownConverter(value) {
 	state.inputs.toughness1 = document.getElementById("toughness-input1").value;
 	state.inputs.toughness2 = document.getElementById("toughness-input2").value;
 	modifyToughnessLabel();
+	state.inputs.price1 = scalePrices(document.getElementById("price-input1").value);
+	state.inputs.price2 = scalePrices(document.getElementById("price-input2").value);
+	modifyPriceLabel();
 })();
 
 callAjax("resources/cards.json", responseText => {
@@ -635,8 +707,12 @@ callAjax("resources/cards.json", responseText => {
 	// Prices get loaded from a separate JSON file.  Since we don't use them for sorting criteria (yet),
 	// we can just rerender our results once we get price data to show prices too!
 	callAjax("resources/SimplifiedPrices.json", responseText => {
-		state.prices = JSON.parse(responseText);
+		let prices = JSON.parse(responseText);
+		state.allCards.forEach(card => {
+			card.priceInfo = prices[getNameForTCGPlayer(card)];
+		})
 		renderCards(state);
+		sortAndRefilter();
 	});
 });
 
