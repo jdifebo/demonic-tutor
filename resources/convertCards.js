@@ -16,7 +16,7 @@ function simplifyFormats(originalCard){
                 "Vintage": "Legal"
             }
         }
-        else if (originalCard.printings.includes("XLN")){
+        else if (originalCard.printings.includes("RIX")){
             return {
                 "Commander": "Legal",
                 "Legacy": "Legal",

@@ -294,8 +294,8 @@ function sortFunction(c1, c2, sortCriteria) {
 			field2 = c2.loyalty === "X" ? 0 : parseInt(c2.loyalty);
 		}
 		else if (sortCriteria[i].by === "price") {
-			field1 = c1.price ? c1.price.price : NaN;
-			field2 = c2.price ? c2.price.price : NaN;
+			field1 = c1.priceInfo ? c1.priceInfo.price : NaN;
+			field2 = c2.priceInfo ? c2.priceInfo.price : NaN;
 		}
 
 		/**
