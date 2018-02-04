@@ -89,7 +89,7 @@ function renderText(text) {
  * This is really bad because now the stuff that's displayed doesn't actually match up with 
  * our state that we defined above.  It's gross.  But it works.  And I don't want to change it. 
  */
-function changeTab(button){
+function changeTab(button) {
 	let parentCardSection = button.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement;
 	let cardName = button.innerHTML.trim();
 	parentCardSection.outerHTML = renderSingleCard(state.multiNameCards[cardName]);
@@ -98,7 +98,7 @@ function changeTab(button){
 
 
 function renderMultiCardTabs(card) {
-	if (card.names == undefined){
+	if (card.names == undefined) {
 		return "";
 	}
 
@@ -120,9 +120,9 @@ function renderMultiCardTabs(card) {
 	`
 }
 
-function debug(card){
+function debug(card) {
 	card.printings.forEach(code => {
-		if (sets[code] === undefined){
+		if (sets[code] === undefined) {
 			console.log("Couldn't find set name for " + code + " for card " + card.name);
 		}
 	})
@@ -333,49 +333,49 @@ function filterAndRenderCards() {
 			(formats[state.inputs.format] === "Legal" || formats[state.inputs.format] === "Restricted")) || state.inputs.format === "All"
 	}
 
-	function cmcRangeChecker(cmc){
+	function cmcRangeChecker(cmc) {
 		let bigger = Math.max(state.inputs.cmc1, state.inputs.cmc2);
 		let smaller = Math.min(state.inputs.cmc1, state.inputs.cmc2);
-		if (smaller == 0 && bigger == 16){
+		if (smaller == 0 && bigger == 16) {
 			return true;
-		} else if (cmc === undefined){
+		} else if (cmc === undefined) {
 			return false;
 		}
 		else {
 			return smaller <= cmc && cmc <= bigger
 		}
 	}
-	function powerRangeChecker(power){
+	function powerRangeChecker(power) {
 		let bigger = Math.max(state.inputs.power1, state.inputs.power2);
 		let smaller = Math.min(state.inputs.power1, state.inputs.power2);
-		if (smaller == -1 && bigger == 15){
+		if (smaller == -1 && bigger == 15) {
 			return true;
-		} else if (power === undefined){
+		} else if (power === undefined) {
 			return false;
 		}
 		else {
 			return smaller <= power && power <= bigger
 		}
 	}
-	function toughnessRangeChecker(toughness){
+	function toughnessRangeChecker(toughness) {
 		let bigger = Math.max(state.inputs.toughness1, state.inputs.toughness2);
 		let smaller = Math.min(state.inputs.toughness1, state.inputs.toughness2);
-		if (smaller == -1 && bigger == 15){
+		if (smaller == -1 && bigger == 15) {
 			return true;
-		} else if (toughness === undefined){
+		} else if (toughness === undefined) {
 			return false;
 		}
 		else {
 			return smaller <= toughness && toughness <= bigger
 		}
 	}
-	
-	function priceRangeChecker(price){
+
+	function priceRangeChecker(price) {
 		let bigger = Math.max(state.inputs.price1, state.inputs.price2);
 		let smaller = Math.min(state.inputs.price1, state.inputs.price2);
-		if (smaller == 0 && bigger == 2000){
+		if (smaller == 0 && bigger == 2000) {
 			return true;
-		} else if (price === undefined){
+		} else if (price === undefined) {
 			return false;
 		}
 		else {
@@ -390,7 +390,7 @@ function filterAndRenderCards() {
 			typesFilters.map(typeFilter => typeFilter.test(card.type)).reduce((b1, b2) => b1 && b2, true) &&
 			colorMatcher(card) &&
 			formatMatcher(card.formats) &&
-			cmcRangeChecker(card.cmc) && 
+			cmcRangeChecker(card.cmc) &&
 			powerRangeChecker(card.power) &&
 			toughnessRangeChecker(card.toughness) &&
 			priceRangeChecker(card.priceInfo ? card.priceInfo.price : undefined)
@@ -408,9 +408,9 @@ function modifyPowerLabel() {
 	let bigger = Math.max(state.inputs.power1, state.inputs.power2);
 	let smaller = Math.min(state.inputs.power1, state.inputs.power2);
 	let power = "";
-	if (smaller == -1 && bigger == 15){
+	if (smaller == -1 && bigger == 15) {
 		power = "Any";
-	} else if (smaller == bigger){
+	} else if (smaller == bigger) {
 		power = smaller;
 	} else {
 		power = smaller + " to " + bigger;
@@ -422,9 +422,9 @@ function modifyToughnessLabel() {
 	let bigger = Math.max(state.inputs.toughness1, state.inputs.toughness2);
 	let smaller = Math.min(state.inputs.toughness1, state.inputs.toughness2);
 	let toughness = "";
-	if (smaller == -1 && bigger == 15){
+	if (smaller == -1 && bigger == 15) {
 		toughness = "Any";
-	} else if (smaller == bigger){
+	} else if (smaller == bigger) {
 		toughness = smaller;
 	} else {
 		toughness = smaller + " to " + bigger;
@@ -436,9 +436,9 @@ function modifyPriceLabel() {
 	let bigger = Math.max(state.inputs.price1, state.inputs.price2);
 	let smaller = Math.min(state.inputs.price1, state.inputs.price2);
 	let price = "";
-	if (smaller == 0 && bigger == 2000){
+	if (smaller == 0 && bigger == 2000) {
 		price = "Any";
-	} else if (smaller == bigger){
+	} else if (smaller == bigger) {
 		price = smaller;
 	} else {
 		price = smaller + " to " + bigger;
@@ -450,14 +450,26 @@ function modifyCmcLabel() {
 	let bigger = Math.max(state.inputs.cmc1, state.inputs.cmc2);
 	let smaller = Math.min(state.inputs.cmc1, state.inputs.cmc2);
 	let cmc = "";
-	if (smaller == 0 && bigger == 16){
+	if (smaller == 0 && bigger == 16) {
 		cmc = "Any";
-	} else if (smaller == bigger){
+	} else if (smaller == bigger) {
 		cmc = smaller;
 	} else {
 		cmc = smaller + " to " + bigger;
 	}
 	document.getElementById("cmc-label").innerHTML = "CMC: " + cmc;
+}
+
+function checkDisableExcludeUnselected() {
+	
+	if (document.getElementById("color-identity").checked == true) {
+		document.getElementById("exclude-unselected").checked = true;
+		document.getElementById("exclude-unselected").disabled = true;
+	}
+	else {
+		document.getElementById("exclude-unselected").checked = false;
+		document.getElementById("exclude-unselected").disabled = false;
+	}
 }
 
 (function addAllEventListeners() {
@@ -540,6 +552,9 @@ function modifyCmcLabel() {
 
 	document.getElementById("color-identity").addEventListener("change", function (event) {
 		state.inputs.colors.colorIdentity = event.target.checked;
+
+		checkDisableExcludeUnselected();
+
 		filterAndRenderCards();
 	});
 
@@ -639,13 +654,13 @@ function modifyCmcLabel() {
 		// constantly get deleted and readded to the dom.  It's annoying to have to re-attach event
 		// listeners every time, so instead we have one listener on the parent element and then test
 		// to see if a click was on a button or not
-		if (event.target.tagName == "BUTTON"){
+		if (event.target.tagName == "BUTTON") {
 			changeTab(event.target);
 		}
 	});
 })();
 
-function scalePrices(rawInput){
+function scalePrices(rawInput) {
 	scale = {
 		0: 0,
 		1: .25,
@@ -928,4 +943,4 @@ var sets = {
 	"C17": "Commander 2017",
 	"XLN": "Ixalan",
 	"CMA": "Commander Anthology"
-  };
+};
