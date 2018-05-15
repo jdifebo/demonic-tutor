@@ -9,14 +9,8 @@ let original = require("./AllCards-x.json");
 
 function simplifyFormats(originalCard){
     if (originalCard.legalities === undefined){
-        if (originalCard.printings.includes("C17")){
-            return {
-                "Commander": "Legal",
-                "Legacy": "Legal",
-                "Vintage": "Legal"
-            }
-        }
-        else if (originalCard.printings.includes("RIX")){
+        
+        if (originalCard.printings.includes("DOM")){
             return {
                 "Commander": "Legal",
                 "Legacy": "Legal",
@@ -24,6 +18,8 @@ function simplifyFormats(originalCard){
                 "Standard": "Legal",
                 "Modern": "Legal"
             }
+        } else {
+            console.error(originalCard.name);
         }
         return undefined;
     }

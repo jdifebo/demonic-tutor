@@ -1,13 +1,10 @@
 var sets = require("./AllSets.json");
+var currentSets = require("./sets.json");
 
-var setNames = 
-    Object.keys(sets)
-    .map(key => sets[key])
-    .map(set => set.name)
-
-var setToSetNames = {}
 Object.keys(sets).forEach(key => {
-    setToSetNames[key] = sets[key].name
+    if (currentSets[key] == undefined) {
+        currentSets[key] = sets[key].name
+    }
 })
 
-console.log(JSON.stringify(setToSetNames));
+console.log(JSON.stringify(currentSets));
