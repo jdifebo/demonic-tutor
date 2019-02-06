@@ -5,7 +5,7 @@
  * also replaces color names with single letters.
  */
 
-let original = require("./AllCards-x.json");
+let original = require("./AllCards.json");
 
 function simplifyFormats(originalCard){
     if (originalCard.printings.includes("DOM")){
@@ -20,6 +20,7 @@ function simplifyFormats(originalCard){
         return undefined;
     }
     let formats = {}
+    console.log(originalCard.name);
     originalCard.legalities.forEach(legality => formats[legality.format] = legality.legality);
     return formats;
 }
@@ -31,7 +32,7 @@ function modifyCard(originalCard){
     card.cmc = originalCard.cmc || 0;
     card.type = originalCard.type;
     card.text = originalCard.text;
-    card.formats = simplifyFormats(originalCard);
+    card.legalities = originalCard.legalities;
     card.manaCost = originalCard.manaCost;
     card.power = originalCard.power;
     card.toughness = originalCard.toughness;

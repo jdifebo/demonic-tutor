@@ -328,9 +328,10 @@ function filterAndRenderCards() {
 	// for each space-separated token that the user supplies for type, I want to make sure that that type is matched by the card's type
 
 	let colorMatcher = createColorMatcherFunction();
-	function formatMatcher(formats) {
-		return (formats !== undefined && formats[state.inputs.format] !== undefined &&
-			(formats[state.inputs.format] === "Legal" || formats[state.inputs.format] === "Restricted")) || state.inputs.format === "All"
+	function formatMatcher(legalities) {
+		if (state.inputs.format === "All") return true;
+		if (legalities === undefined || legalities[state.inputs.format] === undefined) return false;
+		return legalities[state.inputs.format] === "Legal" || legalities[state.inputs.format] === "Restricted" || legalities[state.inputs.format] === "Future"
 	}
 
 	function cmcRangeChecker(cmc) {
@@ -389,7 +390,7 @@ function filterAndRenderCards() {
 			textFilter.test(card.text) &&
 			typesFilters.map(typeFilter => typeFilter.test(card.type)).reduce((b1, b2) => b1 && b2, true) &&
 			colorMatcher(card) &&
-			formatMatcher(card.formats) &&
+			formatMatcher(card.legalities) &&
 			cmcRangeChecker(card.cmc) &&
 			powerRangeChecker(card.power) &&
 			toughnessRangeChecker(card.toughness) &&
