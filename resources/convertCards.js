@@ -7,23 +7,6 @@
 
 let original = require("./AllCards.json");
 
-function simplifyFormats(originalCard){
-    if (originalCard.printings.includes("DOM")){
-        return {
-            "Commander": "Legal",
-            "Legacy": "Legal",
-            "Vintage": "Legal",
-            "Standard": "Legal",
-            "Modern": "Legal"
-        }
-    } else if (originalCard.legalities === undefined){
-        return undefined;
-    }
-    let formats = {}
-    console.log(originalCard.name);
-    originalCard.legalities.forEach(legality => formats[legality.format] = legality.legality);
-    return formats;
-}
 
 
 function modifyCard(originalCard){
@@ -41,19 +24,20 @@ function modifyCard(originalCard){
     card.printings = originalCard.printings;
     card.layout = originalCard.layout;
     card.names = originalCard.names;
+    card.colors = originalCard.colors;
 
-    let colorNameToSymbol = {
-        "White" : "W",
-        "Blue" : "U",
-        "Black" : "B",
-        "Red" : "R",
-        "Green" : "G",
+    // let colorNameToSymbol = {
+    //     "White" : "W",
+    //     "Blue" : "U",
+    //     "Black" : "B",
+    //     "Red" : "R",
+    //     "Green" : "G",
 
-    }
+    // }
 
-    if (originalCard.colors !== undefined){
-        card.colors = originalCard.colors.map(old => colorNameToSymbol[old])
-    }
+    // if (originalCard.colors !== undefined){
+    //     card.colors = originalCard.colors.map(old => colorNameToSymbol[old])
+    // }
 
 
     if (originalCard.names && originalCard.names.length > 1) {
