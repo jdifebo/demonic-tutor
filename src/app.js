@@ -134,7 +134,7 @@ function renderSingleCard(card) {
 	let name = card.name;
 	let manaCostSymbols = card.manaCost ? card.manaCost.substring(1, card.manaCost.length - 1).split("}{") : [];
 	let manaCostImages = manaCostSymbols.map(symbol => renderManaSymbol(symbol)).join("");
-	let cmc = card.cmc;
+	let cmc = card.convertedManaCost;
 	let type = card.type;
 	let ptOrLoyalty = "";
 	let printingsText;
@@ -391,7 +391,7 @@ function filterAndRenderCards() {
 			typesFilters.map(typeFilter => typeFilter.test(card.type)).reduce((b1, b2) => b1 && b2, true) &&
 			colorMatcher(card) &&
 			formatMatcher(card.legalities) &&
-			cmcRangeChecker(card.cmc) &&
+			cmcRangeChecker(card.convertedManaCost) &&
 			powerRangeChecker(card.power) &&
 			toughnessRangeChecker(card.toughness) &&
 			priceRangeChecker(card.priceInfo ? card.priceInfo.price : undefined)

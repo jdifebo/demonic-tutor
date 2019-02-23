@@ -12,7 +12,7 @@ let original = require("./AllCards.json");
 function modifyCard(originalCard){
     let card = {};
     card.name = originalCard.name;
-    card.cmc = originalCard.cmc || 0;
+    card.convertedManaCost = originalCard.convertedManaCost || 0;
     card.type = originalCard.type;
     card.text = originalCard.text;
     card.legalities = originalCard.legalities;
