@@ -24,7 +24,7 @@
 }
 
 .double-slide-container input {
-  /* background: lightgray; */
+  background: transparent;
   pointer-events: none;
   position: absolute;
   overflow: hidden;

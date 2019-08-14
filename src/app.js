@@ -278,8 +278,8 @@ function sortFunction(c1, c2, sortCriteria) {
 			field2 = c2.colors === undefined ? "" : c2.colors.join("");
 		}
 		else if (sortCriteria[i].by === "cmc") {
-			field1 = c1.cmc || 0;
-			field2 = c2.cmc || 0;
+			field1 = c1.convertedManaCost || 0;
+			field2 = c2.convertedManaCost || 0;
 		}
 		else if (sortCriteria[i].by === "power") {
 			field1 = c1.power === "*" ? 0 : parseInt(c1.power);

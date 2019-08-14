@@ -62,9 +62,10 @@ function modifyCard(originalCard){
 
 let arrayOfCards = Object
     .keys(original)
-    .map(key => modifyCard(original[key]))
+    .map(key => modifyCard(original[key]));
     // .filter(card => card.name === "Beck")
     // .filter(card => card.names && card.names.length > 1)
     // .slice(0, 10);
+
 
 console.log(JSON.stringify(arrayOfCards));
