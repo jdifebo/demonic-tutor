@@ -6,8 +6,19 @@
  */
 
 let original = require("./AllCards.json");
+let prices = require('./prices.json');
 
-
+function getCheapestPrice(name){
+    let lowestPrice = undefined;
+    let purchaseUrl = "";
+    for (let set in prices[name]){
+        if ((lowestPrice == undefined || prices[name][set].price < lowestPrice) && prices[name][set].url) {
+            lowestPrice = prices[name][set].price;
+            purchaseUrl = prices[name][set].url;
+        }
+    }
+    return {lowestPrice, purchaseUrl}
+}
 
 function modifyCard(originalCard){
     let card = {};
@@ -25,6 +36,9 @@ function modifyCard(originalCard){
     card.layout = originalCard.layout;
     card.names = originalCard.names;
     card.colors = originalCard.colors;
+    let priceInfo = getCheapestPrice(originalCard.name);
+    card.price = priceInfo.lowestPrice;
+    card.purchaseUrl = priceInfo.purchaseUrl;
 
     // let colorNameToSymbol = {
     //     "White" : "W",
@@ -68,4 +82,4 @@ let arrayOfCards = Object
     // .slice(0, 10);
 
 
-console.log(JSON.stringify(arrayOfCards));
+console.log(JSON.stringify(arrayOfCards, null, 2));

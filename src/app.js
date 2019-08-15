@@ -140,11 +140,17 @@ function renderSingleCard(card) {
 	let printingsText;
 	let printingsHover = card.printings.map(code => sets[code] || code).join("\n");
 	let referralLink = "";
-	let tcgPriceInfo = card.priceInfo;
+	let price = card.price;
+	let purchaseUrl = card.purchaseUrl;
 	let multiCardTabs = renderMultiCardTabs(card);
 
-	if (tcgPriceInfo != undefined) {
-		referralLink = `<a target="_blank" href=` + tcgPriceInfo.link + `>$` + tcgPriceInfo.price + `</a>`
+	if (price != undefined) {
+		if (purchaseUrl != undefined) {
+			referralLink = `<a target="_blank" href=` + purchaseUrl + `>$` + price + `</a>`;
+		}
+		else {
+			referralLink = `<span>$` + price + `</span>`;
+		}
 	};
 
 	if (card.printings.length > 3) {
@@ -294,8 +300,8 @@ function sortFunction(c1, c2, sortCriteria) {
 			field2 = c2.loyalty === "X" ? 0 : parseInt(c2.loyalty);
 		}
 		else if (sortCriteria[i].by === "price") {
-			field1 = c1.priceInfo ? c1.priceInfo.price : NaN;
-			field2 = c2.priceInfo ? c2.priceInfo.price : NaN;
+			field1 = c1.price;
+			field2 = c2.price;
 		}
 
 		/**
@@ -394,7 +400,7 @@ function filterAndRenderCards() {
 			cmcRangeChecker(card.convertedManaCost) &&
 			powerRangeChecker(card.power) &&
 			toughnessRangeChecker(card.toughness) &&
-			priceRangeChecker(card.priceInfo ? card.priceInfo.price : undefined)
+			priceRangeChecker(card.price)
 		);
 	state.pageNumberZeroIndexed = 0;
 	renderCards(state);
@@ -717,19 +723,7 @@ callAjax("resources/cards.json", responseText => {
 	state.allCards = JSON.parse(responseText);
 	state.multiNameCards = {};
 	state.allCards.filter(card => card.names != undefined).forEach(card => state.multiNameCards[card.name] = card);
-	// localStorage.allCards = state.allCards;
 	sortAndRefilter();
-
-	// Prices get loaded from a separate JSON file.  Since we don't use them for sorting criteria (yet),
-	// we can just rerender our results once we get price data to show prices too!
-	callAjax("resources/SimplifiedPrices.json", responseText => {
-		let prices = JSON.parse(responseText);
-		state.allCards.forEach(card => {
-			card.priceInfo = prices[getNameForTCGPlayer(card)];
-		})
-		renderCards(state);
-		sortAndRefilter();
-	});
 });
 
 var sets = {
@@ -1212,5 +1206,21 @@ var sets = {
     "WC04": "World Championship Decks 2004",
     "WC97": "World Championship Decks 1997",
     "WC98": "World Championship Decks 1998",
-    "WC99": "World Championship Decks 1999"
+    "WC99": "World Championship Decks 1999",
+    "C19": "Commander 2019",
+    "M20": "Core Set 2020",
+    "PM20": "Core Set 2020 Promos",
+    "4BB": "Fourth Edition Foreign Black Border",
+    "PHJ": "Hobby Japan Promos",
+    "J19": "Judge Gift Cards 2019",
+    "PPP1": "M20 Promo Packs",
+    "PANA": "MTG Arena Promos",
+    "MH1": "Modern Horizons",
+    "PMH1": "Modern Horizons Promos",
+    "PRNA": "Ravnica Allegiance Promos",
+    "PS19": "San Diego Comic-Con 2019",
+    "SS2": "Signature Spellbook: Gideon",
+    "ELD": "Throne of Eldraine",
+    "WAR": "War of the Spark",
+    "PWAR": "War of the Spark Promos",
 };
